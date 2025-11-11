@@ -1,36 +1,84 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# **FACTURACIÓN DE NEGOCIO**
 
-## Getting Started
-
-First, run the development server:
+## **Estructura del Proyecto**
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+facturacion-de-negocio/
+│
+src/
+├── app/
+│   ├── (pages)/         # Rutas de Frontend
+│   │   ├── home/        # Ejemplo de pagina (e.g. /home)
+│   │   └── ...          # Otras paginas
+│   └── api/v1/          # Rutas de API
+│       ├── facturas/    # Ejemplo de endpoint (e.g. /api/facturas)
+│       ├── emision/     # Ejemplo de endpoint (e.g. /api/emision)
+│       └── ...          # Otras rutas o controladores
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- Frontend (UI): inerfaz de usuario para el manejo de la facturación
+- Backend (API): manejo de datos y emisión de la factura
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## **Ejecución del proyecto (Docker)**
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### **Metodo 1**: Ejecución con uso de `Dockerfile` (Construcción del proyecto)
 
-## Learn More
+### **Metodo 2**: Ejecución con uso de `Dockerfile.dev` (Desarrollo en caliente)
 
-To learn more about Next.js, take a look at the following resources:
+### **Variables de entorno**:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+# 1RA OPCION DB CONFIG
+DB_HOST=
+DB_USER=
+DB_PASSWORD=
+# 2DA OPCION DB CONFIG
+DB_URI=
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## **Backend API Referencia**
 
-## Deploy on Vercel
+#### **Ruta base**:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```http
+/api/v1
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+#### **Ruta para healthckeck**:
+
+```http
+GET /api/v1/health
+```
+
+Respuesta Json esperada:
+
+```json
+{
+  "status": "ok"
+}
+```
+
+## **Tencologias Usadas**
+
+### **Frontend**:
+
+<p align="left">
+  <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" alt="JavaScript" />
+  <img src="https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=next.js&logoColor=white" alt="Next.js" />
+  <img src="https://img.shields.io/badge/TailwindCSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="TailwindCSS" />
+</p>
+
+### **Backend**:
+
+<p align="left">
+  <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" alt="JavaScript" />
+  <img src="https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=next.js&logoColor=white" alt="Next.js" />
+  <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" />
+  <img src="https://img.shields.io/badge/Swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=black" alt="Swagger" />
+</p>
+
+### **Contenerización**:
+
+<p align="left">
+  <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker" />
+</p>
