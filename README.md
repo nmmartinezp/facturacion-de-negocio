@@ -13,13 +13,13 @@ facturacion-de-negocio/
 │
 src/
 ├── app/
-│   ├── (pages)/         # Rutas de Frontend
-│   │   ├── home/        # Ejemplo de pagina (e.g. /home)
-│   │   └── ...          # Otras paginas
-│   └── api/v1/          # Rutas de API
-│       ├── facturas/    # Ejemplo de endpoint (e.g. /api/facturas)
-│       ├── emision/     # Ejemplo de endpoint (e.g. /api/emision)
-│       └── ...          # Otras rutas o controladores
+│   ├── (front_ui)/(pages)/   # Rutas de Frontend
+│   │   ├── home/             # Ejemplo de pagina (e.g. /home)
+│   │   └── ...               # Otras paginas
+│   └── (back_api/)api/v1/    # Rutas de API
+│       ├── facturas/         # Ejemplo de endpoint (e.g. /api/facturas)
+│       ├── emision/          # Ejemplo de endpoint (e.g. /api/emision)
+│       └── ...               #  Otras rutas o controladores
 ```
 
 - Frontend (UI): inerfaz de usuario para el manejo de la facturación
@@ -79,6 +79,70 @@ CREATE TABLE detalle (
 ```
 
 Solo las tablas de factura y detalle recibiran registros nuevos, la tabla de producto contedra registros ya insertados.
+
+Posibles datos para iniciar la base de datos:
+
+```sql
+-----------------------------------------------------
+-- INSERTAR PRODUCTOS (25)
+-----------------------------------------------------
+
+INSERT INTO producto (nombre, descripcion, precio) VALUES
+('Arroz 5kg', 'Bolsa de arroz premium', 35.00),
+('Azúcar 1kg', 'Azúcar refinada', 8.50),
+('Aceite 1L', 'Aceite vegetal', 12.00),
+('Leche 1L', 'Leche entera en botella', 7.00),
+('Fideo 500g', 'Fideo tipo spaghetti', 5.00),
+('Harina 1kg', 'Harina de trigo', 6.50),
+('Sal 1kg', 'Sal fina', 3.00),
+('Gaseosa 2L', 'Bebida sabor cola', 11.00),
+('Jugo 1L', 'Jugo de durazno', 10.00),
+('Pan molde', 'Pan blanco familiar', 15.00),
+('Detergente 1kg', 'Detergente en polvo', 18.00),
+('Lavavajilla 500ml', 'Lavavajilla líquido', 9.00),
+('Shampoo 400ml', 'Shampoo para uso diario', 22.00),
+('Jabón de tocador', 'Jabón aroma natural', 3.50),
+('Papel higiénico 12u', 'Pack económico', 20.00),
+('Café 200g', 'Café molido', 25.00),
+('Té 100u', 'Caja de té negro', 14.00),
+('Mermelada 500g', 'Sabor frutilla', 16.00),
+('Galletas 1pa', 'Galletas dulces', 6.00),
+('Queso 500g', 'Queso semiduro', 30.00),
+('Jamón 200g', 'Jamón rebanado', 18.00),
+('Yogurt 1L', 'Yogurt sabor vainilla', 11.00),
+('Huevos 12u', 'Docena de huevos', 14.00),
+('Mantequilla 200g', 'Mantequilla premium', 12.00),
+('Carne molida 1kg', 'Carne de res molida', 40.00);
+
+-----------------------------------------------------
+-- FACTURAS DE EJEMPLO
+-----------------------------------------------------
+
+INSERT INTO factura (cliente, total) VALUES
+('Juan Pérez', 73.00),
+('Negocio El Buen Sabor', 139.00);
+
+-----------------------------------------------------
+-- DETALLES DE FACTURA 1
+-----------------------------------------------------
+
+INSERT INTO detalle (factura_id, producto_id, cantidad, subtotal) VALUES
+(1, 1, 1, 35.00),
+(1, 4, 2, 14.00),
+(1, 9, 1, 10.00),
+(1, 23, 1, 14.00);
+
+-----------------------------------------------------
+-- DETALLES DE FACTURA 2
+-----------------------------------------------------
+
+INSERT INTO detalle (factura_id, producto_id, cantidad, subtotal) VALUES
+(2, 25, 1, 40.00),
+(2, 20, 1, 30.00),
+(2, 21, 2, 36.00),
+(2, 8, 3, 33.00);
+
+```
 
 ## **Backend API Referencia**
 
