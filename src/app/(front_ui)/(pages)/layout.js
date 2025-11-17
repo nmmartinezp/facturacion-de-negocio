@@ -1,5 +1,6 @@
 import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+import { HeroProvider } from "@/app/(front_ui)/core/providers/HeroProvider";
+import "@/module/common/styles/globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,9 +19,13 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="es" className="dark">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        {children}
+        <HeroProvider>
+          <div className="w-dvw h-dvh min-w-dvw min-h-dvh md:p-16">
+            {children}
+          </div>
+        </HeroProvider>
       </body>
     </html>
   );
