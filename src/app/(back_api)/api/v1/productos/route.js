@@ -8,7 +8,7 @@ export async function GET() {
       "SELECT id, nombre, descripcion, precio FROM producto ORDER BY id ASC"
     );
 
-    // rows ya es un array de todos los productos
+    
     return NextResponse.json({
       error: "false",
       mensaje: "Productos obtenidos con exito",
