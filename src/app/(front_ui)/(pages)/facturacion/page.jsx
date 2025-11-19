@@ -61,6 +61,10 @@ function Facturacion() {
 
   const removeDetail = (id) => {
     setDetails((prev) => prev.filter((detail) => detail.id !== id));
+    setTotal((prevTotal) => {
+      const detailToRemove = details.find((detail) => detail.id === id);
+      return prevTotal - (detailToRemove ? detailToRemove.subtotal : 0);
+    });
   };
 
   return (
