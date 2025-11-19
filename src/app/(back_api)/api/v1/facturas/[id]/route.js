@@ -3,7 +3,7 @@ import pool from "@/app/(back_api)/lib/db";
 
 // GET /api/v1/facturas/:id
 export async function GET(_request, { params }) {
-  const { id } = params;
+  const { id } = await params;
 
   try {
     const facturaRes = await pool.query(
@@ -57,10 +57,7 @@ export async function DELETE(_request, { params }) {
   const { id } = params;
 
   try {
-    const res = await pool.query(
-      "DELETE FROM factura WHERE id = $1",
-      [id]
-    );
+    const res = await pool.query("DELETE FROM factura WHERE id = $1", [id]);
 
     if (res.rowCount === 0) {
       return NextResponse.json(
