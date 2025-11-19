@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Form,
   Input,
@@ -11,6 +11,7 @@ import {
 import { today, getLocalTimeZone } from "@internationalized/date";
 import Link from "next/link";
 import { User, Calendar, Box, Coins, Trash } from "lucide-react";
+import { redirect } from "next/dist/server/api-utils";
 
 export const animals = [
   { key: "kcat", label: "Cat", price: 12.0 },
@@ -32,6 +33,29 @@ function Facturacion() {
   const [submitted, setSubmitted] = useState(null);
   const [details, setDetails] = useState([]);
   const [total, setTotal] = useState(0.0);
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch(`/api/v1/productos`);
+        if (!response.ok) {
+          redirect("/");
+        }
+        const result = await response.json();
+        console.log("Fetched products:", result);
+        if (result.error === "false" && Array.isArray(result.data)) {
+          setProducts(result.data);
+        } else {
+          throw new Error(result.mensaje || "Formato de datos incorrecto");
+        }
+      } catch (err) {
+        redirect("/");
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   const onSubmit = (e) => {
     e.preventDefault();
@@ -133,9 +157,11 @@ function Facturacion() {
                     startContent={<Box />}
                     onSelectionChange={(keys) => {
                       const product_id = Array.from(keys)[0];
-                      const precio_unitario = animals.find(
-                        (animal) => animal.key === product_id
-                      )?.price;
+                      const precio_unitario = parseFloat(
+                        products.find(
+                          (product) => product.id === Number(product_id)
+                        )?.precio
+                      );
                       setDetails((prev) =>
                         prev.map((d) =>
                           d.id === detail.id
@@ -145,8 +171,8 @@ function Facturacion() {
                       );
                     }}
                   >
-                    {animals.map((animal) => (
-                      <SelectItem key={animal.key}>{animal.label}</SelectItem>
+                    {products.map((product) => (
+                      <SelectItem key={product.id}>{product.nombre}</SelectItem>
                     ))}
                   </Select>
                   <Input
