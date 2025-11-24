@@ -3,7 +3,7 @@
 Proyecto que implementa despliegue continuo en una webapp utilizando Github Actions para la automatización de tareas o pasos en el despliegue sobre AWS EC2.
 
 <p align="center">
-  <img src="assets/img/diagramas/Dga_cd.png" width="95%">
+  <img src=".github/assets/img/diagramas/Dga_cd.png" width="95%">
 </p>
 
 ## **Estructura del Proyecto WebApp**

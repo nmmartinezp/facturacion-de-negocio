@@ -7,27 +7,12 @@ import {
   DateInput,
   Select,
   SelectItem,
+  addToast,
 } from "@heroui/react";
 import { today, getLocalTimeZone } from "@internationalized/date";
 import Link from "next/link";
 import { User, Calendar, Box, Coins, Trash } from "lucide-react";
 import { redirect } from "next/dist/server/api-utils";
-
-export const animals = [
-  { key: "kcat", label: "Cat", price: 12.0 },
-  { key: "kdog", label: "Dog", price: 14.0 },
-  { key: "kelephant", label: "Elephant", price: 22.0 },
-  { key: "klion", label: "Lion", price: 42.22 },
-  { key: "ktiger", label: "Tiger", price: 70.5 },
-  { key: "kgiraffe", label: "Giraffe", price: 78.2 },
-  { key: "kdolphin", label: "Dolphin", price: 45.3 },
-  { key: "kpenguin", label: "Penguin", price: 18.5 },
-  { key: "kzebra", label: "Zebra", price: 65.22 },
-  { key: "kshark", label: "Shark", price: 10.56 },
-  { key: "kwhale", label: "Whale", price: 45.2 },
-  { key: "kotter", label: "Otter", price: 45.0 },
-  { key: "kcrocodile", label: "Crocodile", price: 45.0 },
-];
 
 function Facturacion() {
   const [submitted, setSubmitted] = useState(null);
@@ -43,7 +28,6 @@ function Facturacion() {
           redirect("/");
         }
         const result = await response.json();
-        console.log("Fetched products:", result);
         if (result.error === "false" && Array.isArray(result.data)) {
           setProducts(result.data);
         } else {
@@ -64,10 +48,60 @@ function Facturacion() {
     json.cliente = data.cliente;
     json.fecha = data.fecha;
     json.detalles = details.map((detail) => ({
-      product_id: detail.product_id,
+      producto_id: detail.product_id,
       cantidad: detail.cantidad,
     }));
     setSubmitted(json);
+
+    const submitData = async () => {
+      try {
+        const response = await fetch(`/api/v1/facturas`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(json),
+        });
+        if (!response.ok) {
+          addToast({
+            title: "Notificación",
+            variant: "flat",
+            color: "warning",
+            description: "Error al generar la factura",
+          });
+        }
+        const result = await response.json();
+        if (result.error === "false") {
+          addToast({
+            title: "Notificación",
+            variant: "flat",
+            color: "success",
+            description: "Factura generada con exito",
+          });
+        } else {
+          addToast({
+            title: "Notificación",
+            variant: "flat",
+            color: "warning",
+            description: "Error al generar la factura",
+          });
+        }
+      } catch (err) {
+        addToast({
+          title: "Notificación",
+          variant: "flat",
+          color: "warning",
+          description: "Error al enviar la solicitud",
+        });
+      }
+    };
+
+    addToast({
+      title: "Notificación",
+      variant: "flat",
+      description: "Generando la factura, por favor espera...",
+      promise: submitData(),
+    });
   };
 
   const addDetail = () => {
@@ -130,11 +164,6 @@ function Facturacion() {
               value={total}
               type="number"
             />
-            {submitted && (
-              <div className="text-small text-default-500">
-                You submitted: <code>{JSON.stringify(submitted)}</code>
-              </div>
-            )}
           </div>
           <div className="flex-1 h-full flex flex-col gap-2">
             <div className="sticky w-full bottom-0 top-0 flex items-center justify-center bg-foreground-50 rounded p-2 font-bold">
@@ -149,9 +178,9 @@ function Facturacion() {
                   <Select
                     isRequired
                     className="max-w-xs col-span-12"
-                    label="Favorite Animal"
+                    label="Producto"
                     labelPlacement={"outside"}
-                    placeholder="Select an animal"
+                    placeholder="Selecciona un producto"
                     selectedKeys={detail.product_id ? [detail.product_id] : []}
                     variant={"faded"}
                     startContent={<Box />}

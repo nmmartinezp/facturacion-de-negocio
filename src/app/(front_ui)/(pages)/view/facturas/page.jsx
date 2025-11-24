@@ -1,5 +1,5 @@
 "use client";
-import { Card, CardHeader, CardFooter, Button } from "@heroui/react";
+import { Card, CardHeader, CardFooter, Button, addToast } from "@heroui/react";
 import { View, Trash, ChevronLeft } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -29,6 +29,41 @@ function Facturas() {
 
     fetchFacturas();
   }, []);
+
+  const deleteFactura = async (id) => {
+    try {
+      const response = await fetch(`/api/v1/facturas/${id}`, {
+        method: "DELETE",
+      });
+      const result = await response.json();
+      if (result.error === "false") {
+        addToast({
+          title: "Notificación",
+          variant: "flat",
+          color: "success",
+          description: "Factura Eliminada con exito",
+        });
+        setFacturas((prevFacturas) =>
+          prevFacturas.filter((factura) => factura.id !== id)
+        );
+      } else {
+        addToast({
+          title: "Notificación",
+          variant: "flat",
+          color: "warning",
+          description: "Error al eliminar factura: " + result.mensaje,
+        });
+      }
+    } catch (err) {
+      addToast({
+        title: "Notificación",
+        variant: "flat",
+        color: "warning",
+        description: "Error al eliminar factura: " + err.message,
+      });
+    }
+  };
+
   return (
     <div className="w-full h-full flex flex-col gap-4 p-6 md:p-0">
       <div className="w-full flex justify-start items-center gap-4">
@@ -82,6 +117,14 @@ function Facturas() {
                 color="warning"
                 radius="full"
                 size="sm"
+                onPress={() => {
+                  addToast({
+                    title: "Notificación",
+                    variant: "flat",
+                    description: "Eliminando factura, por favor espera...",
+                    promise: deleteFactura(factura.id),
+                  });
+                }}
               >
                 <Trash />
               </Button>
