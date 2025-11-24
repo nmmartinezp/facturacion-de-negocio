@@ -34,7 +34,7 @@ src/
 ### **Variables de entorno**:
 
 ```bash
-# DB CONFIG
+# DBPOSTGRES CONFIG
 DB_URI=
 ```
 
