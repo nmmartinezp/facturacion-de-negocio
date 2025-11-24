@@ -34,11 +34,7 @@ src/
 ### **Variables de entorno**:
 
 ```bash
-# 1RA OPCION DB CONFIG
-DB_HOST=
-DB_USER=
-DB_PASSWORD=
-# 2DA OPCION DB CONFIG
+# DB CONFIG
 DB_URI=
 ```
 
