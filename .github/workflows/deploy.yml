@@ -22,7 +22,7 @@ jobs:
       - name: Login para ECR AWS
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Construir, etiquetar y hacer push de image
+      - name: Construir, etiquetar y hacer push de imagen
         run: |
           IMAGE_URI=${{ secrets.ECR_REPOSITORY }}:latest
           docker build -t $IMAGE_URI .
