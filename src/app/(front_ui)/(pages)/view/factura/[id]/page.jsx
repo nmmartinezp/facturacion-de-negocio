@@ -71,11 +71,6 @@ function Factura({ params }) {
               value={facuraData.total ? facuraData.total : 0}
               type="number"
             />
-            {facuraData && (
-              <div className="text-small text-default-500">
-                You submitted: <code>{JSON.stringify(facuraData)}</code>
-              </div>
-            )}
           </div>
           <div className="flex-1 h-full flex flex-col gap-2">
             <div className="sticky w-full bottom-0 top-0 flex items-center justify-center bg-foreground-50 rounded p-2 font-bold">
