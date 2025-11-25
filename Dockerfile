@@ -1,5 +1,5 @@
 # -----------------------------
-# STAGE 1: Build
+# ETAPA 1: Build
 # -----------------------------
 FROM node:24-slim AS builder
 
@@ -12,7 +12,7 @@ COPY . .
 RUN npm run build
 
 # -----------------------------
-# STAGE 2: Runner
+# ETAPA 2: Runner
 # -----------------------------
 FROM node:24-slim AS runner
 

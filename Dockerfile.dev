@@ -1,3 +1,6 @@
+# -----------------------------
+# EJECUCION DE MODO DEV
+# -----------------------------
 FROM node:24-slim
 WORKDIR /app
 COPY package*.json ./
