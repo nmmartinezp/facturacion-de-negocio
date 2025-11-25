@@ -2,11 +2,14 @@
   "name": "facturacion-de-negocio",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev --webpack",
     "build": "next build --webpack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
   "dependencies": {
     "@heroui/react": "^2.8.5",
@@ -22,6 +25,8 @@
   },
   "devDependencies": {
     "eslint": "^9",
-    "eslint-config-next": "16.0.1"
+    "eslint-config-next": "16.0.1",
+    "jest": "^30.2.0",
+    "supertest": "^7.1.4"
   }
 }
