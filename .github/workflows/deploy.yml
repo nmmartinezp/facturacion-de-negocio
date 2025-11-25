@@ -85,7 +85,7 @@ jobs:
           to: ${{ secrets.EMAIL_TO }}
           from: ${{ secrets.EMAIL_SMTP_USER }}
           content_type: text/html
-          body: |
+          html_body: |
             <h2 style="color:red;">Deploy fallido</h2>
             <p><strong>Workflow:</strong> ${{ github.workflow }}</p>
             <p><strong>Rama:</strong> ${{ github.ref }}</p>
