@@ -20,7 +20,7 @@ jest.mock("next/server", () => ({
 describe("GET /api/v1/health", () => {
   beforeEach(() => jest.clearAllMocks());
 
-  test("✔ debe devolver status='ok' y el nombre de la base de datos", async () => {
+  test("Debe devolver status='ok' y el nombre de la base de datos", async () => {
     pool.query.mockResolvedValueOnce({
       rows: [{ db: "facturacion_db" }],
     });
@@ -35,7 +35,7 @@ describe("GET /api/v1/health", () => {
     });
   });
 
-  test("✔ debe manejar error de la BD y devolver status='error' con 500", async () => {
+  test("Debe manejar error de la BD y devolver status='error' con 500", async () => {
     const fakeError = new Error("Fallo la BD");
     pool.query.mockRejectedValueOnce(fakeError);
 
@@ -49,10 +49,8 @@ describe("GET /api/v1/health", () => {
     expect(res.init).toEqual({ status: 500 });
   });
 
+  // TEST QUE FALLA A PROPÓSITO (RESERVADO PARA PRUEBAS DE FALLO EN GITHUB ACTIONS)
   /*
-  TEST QUE FALLA A PROPÓSITO (RESERVADO)
-  NO SE EJECUTA
-
   test("test que falla a propósito (espera status 201)", async () => {
     pool.query.mockResolvedValueOnce({
       rows: [{ db: "otra_db" }],
