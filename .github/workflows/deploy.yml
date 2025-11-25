@@ -22,6 +22,12 @@ jobs:
       - name: Login para ECR AWS
         uses: aws-actions/amazon-ecr-login@v2
 
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Ejecutar tests unitarios
+        run: npm run test
+
       - name: Construir, etiquetar y hacer push de imagen docker
         run: |
           IMAGE_URI=${{ secrets.ECR_REPOSITORY }}:latest
