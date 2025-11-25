@@ -45,3 +45,36 @@ jobs:
             aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REPOSITORY }}
             docker-compose pull
             docker-compose up -d
+
+      - name: Notificación éxito
+        if: success()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.EMAIL_SMTP_HOST }}
+          server_port: ${{ secrets.EMAIL_SMTP_PORT }}
+          username: ${{ secrets.EMAIL_SMTP_USER }}
+          password: ${{ secrets.EMAIL_SMTP_PASSWORD }}
+          subject: "Deploy exitoso: ${{ github.workflow }}"
+          to: ${{ secrets.EMAIL_TO }}
+          from: ${{ secrets.EMAIL_SMTP_USER }}
+          content_type: text/plain
+          body: |
+            El deploy de la rama ${{ github.ref }} se completó exitosamente.
+            Commit: ${{ github.sha }}
+
+      - name: Notificación fallo
+        if: failure()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.EMAIL_SMTP_HOST }}
+          server_port: ${{ secrets.EMAIL_SMTP_PORT }}
+          username: ${{ secrets.EMAIL_SMTP_USER }}
+          password: ${{ secrets.EMAIL_SMTP_PASSWORD }}
+          subject: "Deploy fallido: ${{ github.workflow }}"
+          to: ${{ secrets.EMAIL_TO }}
+          from: ${{ secrets.EMAIL_SMTP_USER }}
+          content_type: text/plain
+          body: |
+            El deploy de la rama ${{ github.ref }} falló.
+            Commit: ${{ github.sha }}
+            Revisa el workflow aquí: ${{ github.server_url }}/{{ github.repository }}/actions/runs/${{ github.run_id }}
