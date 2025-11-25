@@ -73,6 +73,11 @@ jobs:
             El deploy de la rama ${{ github.ref }} se completó exitosamente.
             Commit: ${{ github.sha }}
 
+      - name: Cargar contenido del step fallido
+        id: read_stepname
+        if: failure()
+        run: echo "stepname=$(cat stepname.txt)" >> $GITHUB_OUTPUT
+
       - name: Notificación de fallo
         if: failure()
         uses: dawidd6/action-send-mail@v3
@@ -92,7 +97,7 @@ jobs:
             <p><strong>Commit:</strong> ${{ github.sha }}</p>
             <h3>Paso que falló:</h3>
             <pre style="background:#f8d7da;padding:10px;border-radius:5px;">
-            $(cat stepname.txt)
+            ${{ steps.read_stepname.outputs.stepname }}
             </pre>
             <p>Revisa los logs del workflow en el siguiente enlace:</p>
             <p>
