@@ -49,6 +49,10 @@ describe("GET /api/v1/health", () => {
     expect(res.init).toEqual({ status: 500 });
   });
 
+  /*
+  TEST QUE FALLA A PROPÓSITO (RESERVADO)
+  NO SE EJECUTA
+
   test("test que falla a propósito (espera status 201)", async () => {
     pool.query.mockResolvedValueOnce({
       rows: [{ db: "otra_db" }],
@@ -59,4 +63,5 @@ describe("GET /api/v1/health", () => {
     // Este EXPECT está mal a propósito: tu handler no devuelve 201
     expect(res.init).toEqual({ status: 201 });
   });
+  */
 });

@@ -68,10 +68,17 @@ jobs:
           subject: "Deploy exitoso: ${{ github.workflow }}"
           to: ${{ secrets.EMAIL_TO }}
           from: ${{ secrets.EMAIL_SMTP_USER }}
-          content_type: text/plain
-          body: |
-            El deploy de la rama ${{ github.ref }} se completó exitosamente.
-            Commit: ${{ github.sha }}
+          content_type: text/html
+          html_body: |
+            <h2 style="color:green;">Deploy exitoso</h2>
+            <p><strong>Workflow:</strong> ${{ github.workflow }}</p>
+            <p><strong>Rama:</strong> ${{ github.ref }}</p>
+            <p><strong>Commit:</strong> ${{ github.sha }}</p>
+            <p>El despliegue se completó correctamente 🎉</p>
+            <p>
+            <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            style="color:blue;">Ver detalles del workflow</a>
+            </p>
 
       - name: Cargar contenido del step fallido
         id: read_stepname
