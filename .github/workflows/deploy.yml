@@ -1,4 +1,4 @@
-name: Deploy APP to EC2
+name: Despliegue de APPWEB a EC2
 
 on:
   push:
@@ -22,14 +22,22 @@ jobs:
       - name: Login para ECR AWS
         uses: aws-actions/amazon-ecr-login@v2
 
+      - name: Registrar step actual (AWS Registro)
+        run: echo "AWS Configuracion y login" > stepname.txt
+
       - name: Instalar dependencias
-        run: npm ci
+        run: |
+          echo "Instalar dependencias" > stepname.txt
+          npm ci
 
       - name: Ejecutar tests unitarios
-        run: npm run test
+        run: |
+          echo "Ejecutar tests unitarios" > stepname.txt
+          npm run test
 
       - name: Construir, etiquetar y hacer push de imagen docker
         run: |
+          echo "Construir, etiquetar y hacer push de imagen docker" > stepname.txt
           IMAGE_URI=${{ secrets.ECR_REPOSITORY }}:latest
           docker build -t $IMAGE_URI .
           docker push $IMAGE_URI
@@ -45,6 +53,9 @@ jobs:
             aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REPOSITORY }}
             docker-compose pull
             docker-compose up -d
+
+      - name: Registrar step actual (SSH dentro de instancia EC2 y actualizar servicio)
+        run: echo "SSH dentro de instancia EC2 y actualizar servicio" > stepname.txt
 
       - name: Notificación de éxito
         if: success()
@@ -73,8 +84,18 @@ jobs:
           subject: "Deploy fallido: ${{ github.workflow }}"
           to: ${{ secrets.EMAIL_TO }}
           from: ${{ secrets.EMAIL_SMTP_USER }}
-          content_type: text/plain
+          content_type: text/html
           body: |
-            El deploy de la rama ${{ github.ref }} falló.
-            Commit: ${{ github.sha }}
-            Revisa el workflow aquí: ${{ github.server_url }}/{{ github.repository }}/actions/runs/${{ github.run_id }}
+            <h2 style="color:red;">Deploy fallido</h2>
+            <p><strong>Workflow:</strong> ${{ github.workflow }}</p>
+            <p><strong>Rama:</strong> ${{ github.ref }}</p>
+            <p><strong>Commit:</strong> ${{ github.sha }}</p>
+            <h3>Paso que falló:</h3>
+            <pre style="background:#f8d7da;padding:10px;border-radius:5px;">
+            $(cat stepname.txt)
+            </pre>
+            <p>Revisa los logs del workflow en el siguiente enlace:</p>
+            <p>
+            <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            style="color:blue;">Ver logs del workflow</a>
+            </p>
