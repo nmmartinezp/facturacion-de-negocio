@@ -46,7 +46,7 @@ jobs:
             docker-compose pull
             docker-compose up -d
 
-      - name: Notificación éxito
+      - name: Notificación de éxito
         if: success()
         uses: dawidd6/action-send-mail@v3
         with:
@@ -62,7 +62,7 @@ jobs:
             El deploy de la rama ${{ github.ref }} se completó exitosamente.
             Commit: ${{ github.sha }}
 
-      - name: Notificación fallo
+      - name: Notificación de fallo
         if: failure()
         uses: dawidd6/action-send-mail@v3
         with:
