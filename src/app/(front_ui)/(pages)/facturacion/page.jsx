@@ -167,7 +167,7 @@ function Facturacion() {
           </div>
           <div className="flex-1 h-full flex flex-col gap-2">
             <div className="sticky w-full bottom-0 top-0 flex items-center justify-center bg-foreground-50 rounded p-2 font-bold">
-              Detalles de Factura
+              Detalles de la Factura
             </div>
             <div className="flex flex-col max-h-[60dvh] md:h-full overflow-y-scroll scrollbar-hide gap-4 z-10">
               {details.map((detail) => (
