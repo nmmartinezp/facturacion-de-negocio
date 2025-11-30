@@ -39,7 +39,7 @@ jobs:
         run: |
           echo "Construir, etiquetar y hacer push de imagen docker" > stepname.txt
           IMAGE_URI=${{ secrets.ECR_REPOSITORY }}:latest
-          docker build --no-cache -t $IMAGE_URI .
+          docker build -t $IMAGE_URI .
           docker push $IMAGE_URI
 
       - name: SSH dentro de instancia EC2 y actualizar servicio
@@ -53,6 +53,7 @@ jobs:
             aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REPOSITORY }}
             docker-compose pull
             docker-compose up -d
+            docker system prune -af --volumes
 
       - name: Registrar step actual (SSH dentro de instancia EC2 y actualizar servicio)
         run: echo "SSH dentro de instancia EC2 y actualizar servicio" > stepname.txt
