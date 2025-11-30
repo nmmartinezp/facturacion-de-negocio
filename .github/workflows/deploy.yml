@@ -39,7 +39,7 @@ jobs:
         run: |
           echo "Construir, etiquetar y hacer push de imagen docker" > stepname.txt
           IMAGE_URI=${{ secrets.ECR_REPOSITORY }}:latest
-          docker build -t $IMAGE_URI .
+          docker build --no-cache -t $IMAGE_URI .
           docker push $IMAGE_URI
 
       - name: SSH dentro de instancia EC2 y actualizar servicio
