@@ -11,7 +11,7 @@ export default function Home() {
             Facturación de Negocio
           </h1>
           <h2 className="md:text-xl opacity-85">
-            UI Frontend Probando cambios
+            UI Frontend Probando cambios 2
           </h2>
         </header>
         <main className="col-span-12 flex items-center justify-center">
