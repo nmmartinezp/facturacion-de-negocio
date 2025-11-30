@@ -10,7 +10,9 @@ export default function Home() {
           <h1 className="text-2xl md:text-4xl font-bold">
             Facturación de Negocio
           </h1>
-          <h2 className="md:text-xl opacity-85">UI Frontend Prueba 1</h2>
+          <h2 className="md:text-xl opacity-85">
+            UI Frontend Probando cambios
+          </h2>
         </header>
         <main className="col-span-12 flex items-center justify-center">
           <div className="w-full gap-6 grid grid-cols-12 px-2">
