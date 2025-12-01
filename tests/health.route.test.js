@@ -50,7 +50,7 @@ describe("GET /api/v1/health", () => {
   });
 
   // TEST QUE FALLA A PROPÓSITO (RESERVADO PARA PRUEBAS DE FALLO EN GITHUB ACTIONS)
-  /*
+
   test("test que falla a propósito (espera status 201)", async () => {
     pool.query.mockResolvedValueOnce({
       rows: [{ db: "otra_db" }],
@@ -61,5 +61,4 @@ describe("GET /api/v1/health", () => {
     // Este EXPECT está mal a propósito: tu handler no devuelve 201
     expect(res.init).toEqual({ status: 201 });
   });
-  */
 });
