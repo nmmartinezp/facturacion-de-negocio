@@ -37,7 +37,7 @@ export default function Home() {
                 </div>
               </Link>
             </Card>
-            {/*
+
             <Card className="col-span-12 md:col-span-6 h-[200px] md:h-[300px] hover:scale-[97%] transition-transform duration-300 active:scale-90 cursor-pointer">
               <Link href="/view/facturas" className="w-full h-full">
                 <CardHeader className="absolute z-10 top-1 flex-col gap-2 items-start!">
@@ -61,7 +61,6 @@ export default function Home() {
                 </div>
               </Link>
             </Card>
-            */}
           </div>
         </main>
       </div>
