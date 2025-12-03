@@ -1,71 +1,158 @@
-# **DESPLIEGUE CONTINUO DE WEBAPP "FACTURACIÓN DE NEGOCIO" CON GITHUB ACTIONS**
+# 🧩 Proyecto Final – Trabajando en la Nube
 
-Proyecto que implementa despliegue continuo en una webapp utilizando Github Actions para la automatización de tareas o pasos en el despliegue sobre AWS EC2.
+**Carrera:** Ingenieria de Sistemas <br>
+**Asignatura:** Trabajando en la Nube (COM610)<br>
+**Docente:** Ing. Marcelo Quispe Ortega<br>
+**Grupo:**
 
-## **Diagrama de despliegue**
+- Martinez Pardo Nisse Maximiliano – (martinezpardonisse@gmail.com)
+- Naomy Yailin Paredes Paredes – (naomyyailinp@gmail.com)
+
+## 📌 DESPLIEGUE CONTINUO DE WEBAPP "FACTURACIÓN DE NEGOCIO" CON GITHUB ACTIONS
+
+## 🎯 Objetivo General
+
+Implementar el despliegue continuo de una web app utilizando Github Actions para la automatización de tareas o pasos en el despliegue sobre AWS EC2.
+
+## 🎯 Objetivos Específicos
+
+- Preparar el ambiente AWS para desplegar el proyecto.
+- Crear el workflow para el despliegue automatizado en github actions del proyecto.
+- Demostrar el despligue automatizado con cambios en el proyecto.
+
+## 📝 Descripción General del Proyecto
+
+El proyecto esta hecho para poder dejar las tareas manuales de actualización de la app web sobre la instancia EC2 en AWS utilizando la herramienta de automatización que es github actions.
+
+## 🛠️ Tecnologías Utilizadas
+
+- Github Actions
+  - Herramienta de automatización para el despliegue de la app
+- Github Secrets
+  - Utilidad para almacenar secretos como claves y credenciales para github actions
+- Docker
+  - Herramienta de contenerizado para la instancia ec2
+- Docker Compose
+  - Herramienta de orquestación para los contenedores docker
+- AWS EC2
+  - Servicio para crear la instancia donde se desplegara la app
+- AWS RDS
+  - Servicio para la base de datos postgres que usara la app
+- AWS ECR
+  - Servicio de repositorio para la imagen docker que contendra la app
+- Lenguajes, frameworks adicionales
+  - Javascript .- Lenguaje de programación
+  - Nextjs .- Framework React para Frontend y Backend
+
+## 📚 Temas de la Asignatura Implementados
+
+### Contenerización con Docker
+
+- Herramienta de contenerizado, usada para crear la imagen docker de nuestra app
+- Dockerfile utilizado:
+
+  ```DockerFile
+  # -----------------------------
+  # ETAPA 1: Build
+  # -----------------------------
+  FROM node:24-slim AS builder
+
+  WORKDIR /app
+
+  COPY package*.json ./
+  RUN npm install
+
+  COPY . .
+  RUN npm run build
+
+  # -----------------------------
+  # ETAPA 2: Runner
+  # -----------------------------
+  FROM node:24-slim AS runner
+
+  WORKDIR /app
+
+  COPY package*.json ./
+  RUN npm install --omit=dev
+
+  COPY --from=builder /app/.next ./.next
+  COPY --from=builder /app/public ./public
+  COPY --from=builder /app/next.config.mjs ./next.config.mjs
+  COPY --from=builder /app/package.json ./package.json
+
+  EXPOSE 3000
+  CMD ["npm", "run", "start"]
+  ```
+
+### Orquestación con Docker Compose
+
+- Dentro de la instancia EC2 definimos el servicio:
+  - app: utiliza la URI del repositorio ECR para cargar la imagen docker de la app
+- Variables de entorno:
+
+  ```env
+  DB_URI=postgresql://usuario:contrseña@URI_de_conexión_host/nombre_de_base_de_datos
+  PRODUCTION=true
+  ```
+
+### Instancias Computacionales, Acceso Seguro y Bases de Datos (EC2, RDS)
+
+- Configuración de la instancia EC2
+  - Se creo grupos de seguridad con las reglas:
+    - HTTP (cualquiera)
+    - HTTPS (cualquiera)
+- Acceso SSH / llaves
+  - Se creo grupos de seguridad con permisos ssh
+  - Se genero llaves para el ingreso a la instancia EC2
+- Configuración de seguridad (Security Groups)
+  - Grupo de seguridad para la instancia EC2 con permisos de trafico HTTP Y HTTPS
+  - Grupo de seguridad para la instancia EC2 con permisos de SSH
+  - Grupo de seguridad para la instnacia RDS con permisos para recibir trafico solo de la instancia EC2
+- Motor de base de datos en RDS
+  - Uso de Postgres
+- Conexiones seguras a la BD
+  - Solo se permite trafico desde la instancia EC2 y IP de administración permitidas
+
+### Almacenamiento (ECR)
+
+- Uso de un repositorio ECR para el almacenamiento de imagenes docker
+- Uso de la etiqueta :latest para la imagen
+
+## 🏗️ Arquitectura del Sistema
+
+### Diagrama General de la Infraestructura
 
 <p align="center">
   <img src=".github/assets/img/diagramas/Dga_cd.png" width="95%">
 </p>
 
-## **Worflow para github actions**
+### Explicación del Flujo de la Solución
 
-- **Nombre de worflow**: Despliegue de APPWEB a EC2
-- **Rama de aplicación**: Master
-- **Jobs**: deploy
-- **Maquina para deploy**: ubuntu-latest
-- **Pasos de deploy**:
-  - **Checkout code**: Trae el codigo a la maquina asignada
-  - **Configurar Credenciales AWS**: Establece las credenciales aws para la maquina asignada
-  - **Login para ECR AWS**: Establece una sesion para poder usar ECR
-  - **Registrar step actual (AWS Registro)**: Paso para registrar el paso actual con fines de notificacion
-  - **Instalar dependencias**: Instalacion previa para poder ejecutar el siguiente paso de tests
-  - **Ejecutar tests unitarios**: Ejecuta los tests unitarios del proyecto
-  - **Construir, etiquetar y hacer push de imagen docker**: Tratamiento de imagen docker
-  - **SSH dentro de instancia EC2 y actualizar servicio**: Actualiza el servicio en la instancia EC2
-  - **Registrar step actual (SSH dentro de instancia EC2 y actualizar servicio)**: Paso para registrar el paso actual con fines de notificacion
-  - **Notificación de éxito**: Si todos los pasos se completaron con exito envia una notificacion de correo electronico con detalles de exito
-  - **Cargar contenido del step fallido**: Guarda el paso fallido si hubiera alguno
-  - **Notificación de fallo**: Si algun paso falla envia una notificacion de correo electronico con detalles de fallo
+Describir cómo interactúan los componentes:
 
-Puede consultar el archivo de worflow deploy.yml [aqui](https://github.com/nmmartinezp/facturacion-de-negocio/blob/master/.github/workflows/deploy.yml).
+- Desarrolador sube un cambio → Github lee el workflow → Github actions comienza el despliegue
+- Github Secrets da los secretos → Github actions: Clonación de proyecto → Inicio de AWS CLI → Test unitarios ejecutados → Docker construye la imagen → Se sube la imagen a ECR → Se accesde a la instancia EC2 → Se actualiza la imagen con la nueva subida en ECR → Se envia un email con el resultado del despliegue
+- EC2 expone la app → La app dirige peticiones a RDS
 
-## **Secrests usados en github secrets**
+## 🚀 Pasos para Desplegar la Solución
 
-<div align="center">
-<table>
-  <thead>
-    <tr>
-      <th>Secret</th>
-      <th>Descripción</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr><td><code>AWS_ACCESS_KEY_ID</code></td><td>Id de llave de acceso de usuario aws con permisos AmazonEC2ContainerRegistry y AmazonEC2</td></tr>
-    <tr><td><code>AWS_SECRET_ACCESS_KEY</code></td><td>Llave de acceso de usuario aws con permisos AmazonEC2ContainerRegistry y AmazonEC2</td></tr>
-    <tr><td><code>AWS_REGION</code></td><td>Región de despliegue de servicio</td></tr>
-    <tr><td><code>ECR_REPOSITORY</code></td><td>URI de repositorio de ECR</td></tr>
-    <tr><td><code>EC2_HOST</code></td><td>Dominio DNS O IP Publica de instancia EC2</td></tr>
-    <tr><td><code>EC2_USER</code></td><td>Usuario de instancia EC2 a usar</td></tr>
-    <tr><td><code>EC2_SSH_KEY</code></td><td>Contenido de la llave de acceso generada en EC2 en tu archivo .pem</td></tr>
-    <tr><td><code>EMAIL_SMTP_HOST</code></td><td>Host de servidor email. Recomendado para gmail "smtp.gmail.com"</td></tr>
-    <tr><td><code>EMAIL_SMTP_PORT</code></td><td>Puerto de servidor email. Recomendado "587"</td></tr>
-    <tr><td><code>EMAIL_SMTP_USER</code></td><td>Correo que enviara el email</td></tr>
-    <tr><td><code>EMAIL_SMTP_PASSWORD</code></td><td>Contraseña o token para usar correo que envia el email</td></tr>
-    <tr><td><code>EMAIL_TO</code></td><td>Correo de destino</td></tr>
-  </tbody>
-</table>
-</div>
+### Requisitos Previos
 
-## **Preparación de ambiente AWS**
+- Cuenta AWS
+- Entorno de desarrollo con Docker
+- Repositorio en Github
 
-#### **Servicio Identity and Access Management IAM**
+### Instrucciones
+
+### Preparación de ambiente AWS
+
+#### Servicio Identity and Access Management IAM
 
 - Creación de un usuario (persona) con permisos AmazonEC2ContainerRegistryFullAccess y AmazonEC2FullAccess
 - Creación de claves para el usuario (persona) creado
 - Creación de rol con permisos AmazonEC2ContainerRegistryReadOnly
 
-#### **Security Groups de EC2**
+#### Security Groups de EC2
 
 - Crear grupo de seguridad para la instancia EC2 con reglas:
   - HTTPS: Cualquiera
@@ -75,7 +162,7 @@ Puede consultar el archivo de worflow deploy.yml [aqui](https://github.com/nmmar
   - PostgresSQL: al grupo de seguridad de la instancia EC2
   - PostgresSQL: MI IP
 
-#### **Servicio Amazon Elastic Compute Cloud EC2**
+#### Servicio Amazon Elastic Compute Cloud EC2
 
 - Crear una instancia EC2 con:
   - Imagen Ubuntu
@@ -126,15 +213,15 @@ Puede consultar el archivo de worflow deploy.yml [aqui](https://github.com/nmmar
   EOF
   ```
 
-#### **Servicio Aurora and RDS**
+#### Servicio Aurora and RDS
 
 - Crear una instancia de base de datos PostgresSQL con acceso publico
 
-#### **Servicio Amazon Elastic Container Registry ECR**
+#### Servicio Amazon Elastic Container Registry ECR
 
 - Creación de un repositorio con la Inmutabilidad de etiqueta: Mutable
 
-## **Estructura del Proyecto WebApp**
+### Estructura del Proyecto WebApp
 
 ```bash
 facturacion-de-negocio/
@@ -152,13 +239,13 @@ src/
 - Frontend (UI): inerfaz de usuario para el manejo de la facturación
 - Backend (API): manejo de datos y emisión de la factura
 
-## **Ejecución del proyecto (Docker)**
+### Ejecución del proyecto (Docker)
 
-### **MODO 1**: Ejecución con uso de `Dockerfile` (Construcción del proyecto)
+#### MODO 1: Ejecución con uso de `Dockerfile` (Construcción del proyecto)
 
-### **MODO 2**: Ejecución con uso de `Dockerfile.dev` (Desarrollo en caliente)
+#### MODO 2: Ejecución con uso de `Dockerfile.dev` (Desarrollo en caliente)
 
-### **Variables de entorno**:
+#### Variables de entorno:
 
 ```bash
 # DBPOSTGRES CONFIG
@@ -167,7 +254,7 @@ DB_URI=
 PRODUCTION=
 ```
 
-## **Backend Base de Datos**
+### Backend Base de Datos
 
 ```sql
 -----------------------------------------------------
@@ -204,101 +291,6 @@ CREATE TABLE detalle (
 ```
 
 Solo las tablas de factura y detalle recibiran registros nuevos, la tabla de producto contedra registros ya insertados.
-
-Posibles datos para iniciar la base de datos:
-
-```sql
------------------------------------------------------
--- INSERTAR PRODUCTOS (25)
------------------------------------------------------
-
-INSERT INTO producto (nombre, descripcion, precio) VALUES
-('Arroz 5kg', 'Bolsa de arroz premium', 35.00),
-('Azúcar 1kg', 'Azúcar refinada', 8.50),
-('Aceite 1L', 'Aceite vegetal', 12.00),
-('Leche 1L', 'Leche entera en botella', 7.00),
-('Fideo 500g', 'Fideo tipo spaghetti', 5.00),
-('Harina 1kg', 'Harina de trigo', 6.50),
-('Sal 1kg', 'Sal fina', 3.00),
-('Gaseosa 2L', 'Bebida sabor cola', 11.00),
-('Jugo 1L', 'Jugo de durazno', 10.00),
-('Pan molde', 'Pan blanco familiar', 15.00),
-('Detergente 1kg', 'Detergente en polvo', 18.00),
-('Lavavajilla 500ml', 'Lavavajilla líquido', 9.00),
-('Shampoo 400ml', 'Shampoo para uso diario', 22.00),
-('Jabón de tocador', 'Jabón aroma natural', 3.50),
-('Papel higiénico 12u', 'Pack económico', 20.00),
-('Café 200g', 'Café molido', 25.00),
-('Té 100u', 'Caja de té negro', 14.00),
-('Mermelada 500g', 'Sabor frutilla', 16.00),
-('Galletas 1pa', 'Galletas dulces', 6.00),
-('Queso 500g', 'Queso semiduro', 30.00),
-('Jamón 200g', 'Jamón rebanado', 18.00),
-('Yogurt 1L', 'Yogurt sabor vainilla', 11.00),
-('Huevos 12u', 'Docena de huevos', 14.00),
-('Mantequilla 200g', 'Mantequilla premium', 12.00),
-('Carne molida 1kg', 'Carne de res molida', 40.00);
-
------------------------------------------------------
--- FACTURAS DE EJEMPLO
------------------------------------------------------
-
-INSERT INTO factura (cliente, total) VALUES
-('Juan Pérez', 73.00),
-('Negocio El Buen Sabor', 139.00);
-
------------------------------------------------------
--- DETALLES DE FACTURA 1
------------------------------------------------------
-
-INSERT INTO detalle (factura_id, producto_id, cantidad, subtotal) VALUES
-(1, 1, 1, 35.00),
-(1, 4, 2, 14.00),
-(1, 9, 1, 10.00),
-(1, 23, 1, 14.00);
-
------------------------------------------------------
--- DETALLES DE FACTURA 2
------------------------------------------------------
-
-INSERT INTO detalle (factura_id, producto_id, cantidad, subtotal) VALUES
-(2, 25, 1, 40.00),
-(2, 20, 1, 30.00),
-(2, 21, 2, 36.00),
-(2, 8, 3, 33.00);
-
-```
-
-## **Ejecución Local del Proyecto con Docker Compose**
-
-```yml
-services:
-  app:
-    build: ./facturacion-de-negocio
-    image: app:1.0
-    container_name: app
-    ports:
-      - "3000:3000"
-    restart: always
-    environment:
-      - DB_URI=postgresql://user:1234@db:5432/db_facturacion
-      - PRODUCTION=false
-    depends_on:
-      - db
-  db:
-    image: postgres:alpine3.22
-    container_name: db_data
-    restart: always
-    environment:
-      - POSTGRES_USER=user
-      - POSTGRES_PASSWORD=1234
-      - POSTGRES_DB=db_facturacion
-    volumes:
-      - db_data:/var/lib/postgresql/data
-      - ./dbconfig/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
-volumes:
-  db_data:
-```
 
 ## **Frontend UI Vistas**
 
@@ -501,41 +493,61 @@ Respuesta json esperada:
 }
 ```
 
-## **Tencologias Usadas**
+### Worflow para github actions
 
-### **Frontend**:
+- **Nombre de worflow**: Despliegue de APPWEB a EC2
+- **Rama de aplicación**: Master
+- **Jobs**: deploy
+- **Maquina para deploy**: ubuntu-latest
+- **Pasos de deploy**:
+  - **Checkout code**: Trae el codigo a la maquina asignada
+  - **Configurar Credenciales AWS**: Establece las credenciales aws para la maquina asignada
+  - **Login para ECR AWS**: Establece una sesion para poder usar ECR
+  - **Registrar step actual (AWS Registro)**: Paso para registrar el paso actual con fines de notificacion
+  - **Instalar dependencias**: Instalacion previa para poder ejecutar el siguiente paso de tests
+  - **Ejecutar tests unitarios**: Ejecuta los tests unitarios del proyecto
+  - **Construir, etiquetar y hacer push de imagen docker**: Tratamiento de imagen docker
+  - **SSH dentro de instancia EC2 y actualizar servicio**: Actualiza el servicio en la instancia EC2
+  - **Registrar step actual (SSH dentro de instancia EC2 y actualizar servicio)**: Paso para registrar el paso actual con fines de notificacion
+  - **Notificación de éxito**: Si todos los pasos se completaron con exito envia una notificacion de correo electronico con detalles de exito
+  - **Cargar contenido del step fallido**: Guarda el paso fallido si hubiera alguno
+  - **Notificación de fallo**: Si algun paso falla envia una notificacion de correo electronico con detalles de fallo
 
-<p align="left">
-  <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" alt="JavaScript" />
-  <img src="https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=next.js&logoColor=white" alt="Next.js" />
-  <img src="https://img.shields.io/badge/TailwindCSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="TailwindCSS" />
-  <img src="https://img.shields.io/badge/HeroUI-000000?style=for-the-badge&logo=heroui&logoColor=white" alt="HeroUI" />
-</p>
+Puede consultar el archivo de worflow deploy.yml [aqui](https://github.com/nmmartinezp/facturacion-de-negocio/blob/master/.github/workflows/deploy.yml).
 
-### **Backend**:
+### Secrests usados en github secrets
 
-<p align="left">
-  <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" alt="JavaScript" />
-  <img src="https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=next.js&logoColor=white" alt="Next.js" />
-  <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" />
-</p>
+<div align="center">
+<table>
+  <thead>
+    <tr>
+      <th>Secret</th>
+      <th>Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td><code>AWS_ACCESS_KEY_ID</code></td><td>Id de llave de acceso de usuario aws con permisos AmazonEC2ContainerRegistry y AmazonEC2</td></tr>
+    <tr><td><code>AWS_SECRET_ACCESS_KEY</code></td><td>Llave de acceso de usuario aws con permisos AmazonEC2ContainerRegistry y AmazonEC2</td></tr>
+    <tr><td><code>AWS_REGION</code></td><td>Región de despliegue de servicio</td></tr>
+    <tr><td><code>ECR_REPOSITORY</code></td><td>URI de repositorio de ECR</td></tr>
+    <tr><td><code>EC2_HOST</code></td><td>Dominio DNS O IP Publica de instancia EC2</td></tr>
+    <tr><td><code>EC2_USER</code></td><td>Usuario de instancia EC2 a usar</td></tr>
+    <tr><td><code>EC2_SSH_KEY</code></td><td>Contenido de la llave de acceso generada en EC2 en tu archivo .pem</td></tr>
+    <tr><td><code>EMAIL_SMTP_HOST</code></td><td>Host de servidor email. Recomendado para gmail "smtp.gmail.com"</td></tr>
+    <tr><td><code>EMAIL_SMTP_PORT</code></td><td>Puerto de servidor email. Recomendado "587"</td></tr>
+    <tr><td><code>EMAIL_SMTP_USER</code></td><td>Correo que enviara el email</td></tr>
+    <tr><td><code>EMAIL_SMTP_PASSWORD</code></td><td>Contraseña o token para usar correo que envia el email</td></tr>
+    <tr><td><code>EMAIL_TO</code></td><td>Correo de destino</td></tr>
+  </tbody>
+</table>
+</div>
 
-### **Contenerización**:
+## 📚 Conclusiones y Lecciones Aprendidas
 
-<p align="left">
-  <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker" />
-</p>
+Luego del desarrollo de todo el proyecto se logro:
 
-### **Despliegue Continuo**:
+- Implementar un workflow que despliega la app al solo subir un cambio a la rama principal master
+- Implementar una infraestructura en la nube, aunque sencilla capaz de lidiar con cambios automatizados
+- Poder evitar una actualización manual sobre la insfraestrucutra en la nube
 
-<p align="left">
-  <img src="https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=github-actions&logoColor=white" alt="GitHub Actions" />
-  <img src="https://img.shields.io/badge/GitHub_Secrets-6e5494?style=for-the-badge&logo=github&logoColor=white" alt="GitHub Secrets" />
-</p>
-
-### **Plataforma de despliegue**:
-
-<p align="left">
-  <img src="https://img.shields.io/badge/AWS_EC2-FF9900?style=for-the-badge&logo=amazon-aws&logoColor=white" alt="AWS EC2" />
-  <img src="https://img.shields.io/badge/AWS_ECR-FF9900?style=for-the-badge&logo=amazon-aws&logoColor=white" alt="AWS ECR" />
-</p>
+Las automatización en cuento a despliegue evitan seguir pasos repetitivos en los cuales podemos cometer errores, por lo cual esto quita una carga de trabajo a la hora de lidiar con nuevas actualización en una app despleguedada en la nube.
