@@ -12,7 +12,54 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Configurar Credenciales AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login para ECR AWS
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Registrar step actual (AWS Registro)
+        run: echo "AWS Configuracion y login" > stepname.txt
+
+      - name: Instalar dependencias
+        run: |
+          echo "Instalar dependencias" > stepname.txt
+          npm ci
+
+      - name: Ejecutar tests unitarios
+        run: |
+          echo "Ejecutar tests unitarios" > stepname.txt
+          npm run test
+
+      - name: Construir, etiquetar y hacer push de imagen docker
+        run: |
+          echo "Construir, etiquetar y hacer push de imagen docker" > stepname.txt
+          IMAGE_URI=${{ secrets.ECR_REPOSITORY }}:latest
+          docker build -t $IMAGE_URI .
+          docker push $IMAGE_URI
+
+      - name: SSH dentro de instancia EC2 y actualizar servicio
+        uses: appleboy/ssh-action@v1.1.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd /home/ubuntu/
+            aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REPOSITORY }}
+            docker-compose pull
+            docker-compose up -d
+            docker system prune -af --volumes
+
+      - name: Registrar step actual (SSH dentro de instancia EC2 y actualizar servicio)
+        run: echo "SSH dentro de instancia EC2 y actualizar servicio" > stepname.txt
+
       - name: Notificación de éxito
+        if: success()
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: ${{ secrets.EMAIL_SMTP_HOST }}
@@ -24,4 +71,44 @@ jobs:
           from: ${{ secrets.EMAIL_SMTP_USER }}
           content_type: text/html
           html_body: |
-            <h2 style="color:green;">Deploy exitoso si</h2>
+            <h2 style="color:green;">Deploy exitoso</h2>
+            <p><strong>Workflow:</strong> ${{ github.workflow }}</p>
+            <p><strong>Rama:</strong> ${{ github.ref }}</p>
+            <p><strong>Commit:</strong> ${{ github.sha }}</p>
+            <p>El despliegue se completó correctamente 🎉</p>
+            <p>
+            <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            style="color:blue;">Ver detalles del workflow</a>
+            </p>
+
+      - name: Cargar contenido del step fallido
+        id: read_stepname
+        if: failure()
+        run: echo "stepname=$(cat stepname.txt)" >> $GITHUB_OUTPUT
+
+      - name: Notificación de fallo
+        if: failure()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.EMAIL_SMTP_HOST }}
+          server_port: ${{ secrets.EMAIL_SMTP_PORT }}
+          username: ${{ secrets.EMAIL_SMTP_USER }}
+          password: ${{ secrets.EMAIL_SMTP_PASSWORD }}
+          subject: "Deploy fallido: ${{ github.workflow }}"
+          to: ${{ secrets.EMAIL_TO }}
+          from: ${{ secrets.EMAIL_SMTP_USER }}
+          content_type: text/html
+          html_body: |
+            <h2 style="color:red;">Deploy fallido</h2>
+            <p><strong>Workflow:</strong> ${{ github.workflow }}</p>
+            <p><strong>Rama:</strong> ${{ github.ref }}</p>
+            <p><strong>Commit:</strong> ${{ github.sha }}</p>
+            <h3>Paso que falló:</h3>
+            <pre style="background:#f8d7da;padding:10px;border-radius:5px;">
+            ${{ steps.read_stepname.outputs.stepname }}
+            </pre>
+            <p>Revisa los logs del workflow en el siguiente enlace:</p>
+            <p>
+            <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            style="color:blue;">Ver logs del workflow</a>
+            </p>
