@@ -24,4 +24,4 @@ jobs:
           from: ${{ secrets.EMAIL_SMTP_USER }}
           content_type: text/html
           html_body: |
-            <h2 style="color:green;">Deploy exitoso</h2>
+            <h2 style="color:green;">Deploy exitoso si</h2>
